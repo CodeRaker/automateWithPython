@@ -1,6 +1,14 @@
 """ The Toolbox module is written by Peter Hecht Glad and contains the following tools: """
 
-import socket, subprocess, paramiko
+import socket, subprocess
+
+##########################################################################################################################
+# Optional modules from requirements.txt are ignored if non-existent
+##########################################################################################################################
+try:
+    import paramiko
+except ImportError:
+    pass
 
 ##########################################################################################################################
 # Command Executor
@@ -120,7 +128,7 @@ def service(services, action, verbose):
                 print('[V] Reloading service: ' + service)
 
 ##########################################################################################################################
-# Execute remote SSH command and sudo
+# Execute remote SSH command and sudo (requires paramiko module installed)
 # Example: run_ssh_command('10.10.10.1', 22, 'username', 'password', 'systemctl start apache2', True)
 ##########################################################################################################################
 def run_ssh_command(server, port, user, password, command, verbose):
