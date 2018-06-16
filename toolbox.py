@@ -1,6 +1,6 @@
 """ The Toolbox module is written by Peter Hecht Glad and contains the following tools: """
 
-import socket, subprocess
+import socket, subprocess, os
 
 ##########################################################################################################################
 # Optional modules from requirements.txt are ignored if non-existent
