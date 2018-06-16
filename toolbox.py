@@ -30,10 +30,7 @@ def check_tcp_port(ip, port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         result = sock.connect_ex((ip,port))
-        if result == 0:
-            return True
-        else:
-            return False
+        return not result
     except Exception as e:
         return False
 
