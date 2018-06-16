@@ -18,7 +18,7 @@ for module in optional_modules:
 ##########################################################################################################################
 def run_command(command, verbose):
     CMD = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    if verbose == True:
+    if verbose:
         print(CMD.stdout.read())
     return CMD.stdout.read()
 
@@ -66,11 +66,11 @@ def file_editor(filepath, line_startswith, text_to_append, verbose):
                else:
                    outfile.write(line + '\n')
             outfile.write(text_to_append + "\n")
-            if verbose == True:
+            if verbose:
                 print('[V] Appendended: ' + text_to_append)
             run_command('mv ' + path + ' ' + path + '.old')
             run_command('mv ' + path + '.new ' + path)
-            if verbose == True:
+            if verbose:
                 print('[V] Backed up original config file to ' + path + '.old')
 
 ##########################################################################################################################
@@ -82,12 +82,12 @@ def apt_check_packages(packages, verbose):
     packages_not_installed = []
     for package in packages:
         if '[installed]' in run_command('apt list ' + package):
-            if verbose == True:
+            if verbose:
                 print('[V] ' + package + ' is installed')
             packages_installed.append(package)
         else:
             packages_not_installed.append(package)
-            if verbose == True:
+            if verbose:
                 print('[V] ' + package + ' is not installed')
     return packages_installed, packages_not_installed
 
@@ -98,7 +98,7 @@ def apt_check_packages(packages, verbose):
 def apt_install_packages(packages, verbose):
     packages_installed, packages_not_installed = apt_check_packages(packages, verbose)
     for package in packages_not_installed:
-        if verbose == True:
+        if verbose:
             print('[V] Installing ' + package)
         run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package)
 
@@ -130,7 +130,7 @@ def run_ssh_command(server, port, user, password, command, verbose):
     stdout = session.makefile('rb', -1)
     stdin.write(password +'\n')
     stdin.flush()
-    if verbose == True:
+    if verbose:
         print('Host: ' + server)
         for line in stdout.read().splitlines():
             print(line)
