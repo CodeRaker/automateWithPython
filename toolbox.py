@@ -53,7 +53,7 @@ def check_ipv4_syntax(address):
 
 ##########################################################################################################################
 # Loops through given file and comments lines in and appends a provided string or replaces strings depending on mode
-# Example: toolbox.file_editor('/etc/ntp.conf', 'pool ', 'pool myserver', False)
+# Example: toolbox.file_editor('comment', '/etc/ntp.conf', 'pool ', 'pool myserver', False)
 ##########################################################################################################################
 def file_editor(mode, filepath, line_startswith, text_to_add, verbose):
     with open(filepath) as infile:
@@ -76,7 +76,25 @@ def file_editor(mode, filepath, line_startswith, text_to_add, verbose):
             run_command('mv ' + filepath + '.new ' + filepath, False)
             if verbose:
                 print('[V] Backed up original config file to ' + filepath + '.old')
-
+                
+##########################################################################################################################
+# Writes a new file
+# Example: toolbox.file_writer('/etc/ntp.conf', 'text', False)
+##########################################################################################################################
+def file_writer(filepath, text_to_add, verbose):
+    if os.path.exists(filepath):
+        outfile_name = filepath + '.new'
+    else:
+        outfile_name = filepath
+    with open(outfile_name, 'w') as outfile:
+        for line in text_to_add.split('\n'):
+            outfile.write(line + '\n')
+        if outfile_name.endswith('.new'):
+            run_command('mv ' + filepath + ' ' + filepath + '.old', False)
+            run_command('mv ' + filepath + '.new ' + filepath, False)
+            if verbose:
+                print('[V] Backed up original file to ' + filepath + '.old')
+            
 ##########################################################################################################################
 # Takes a list object and checks if apt package is installed and returns two list objects
 # Example: list = ['mlocate', 'telnet']; toolbox.apt_check_packages(list, True)
