@@ -109,22 +109,9 @@ def apt_install_packages(packages, verbose):
 def service(services, action, verbose):
     systemctl_verbose = False
     for service in services:
-        if action == 'restart':
-            run_command('systemctl restart ' + service, systemctl_verbose)
-            if verbose == True:
-                print('[V] Restarting service: ' + service)
-        if action == 'start':
-            run_command('systemctl start ' + service, systemctl_verbose)
-            if verbose == True:
-                print('[V] Starting service: ' + service)
-        if action == 'stop':
-            run_command('systemctl stop ' + service, systemctl_verbose)
-            if verbose == True:
-                print('[V] Stopping service: ' + service)
-        if action == 'reload':
-            run_command('systemctl reload ' + service, systemctl_verbose)
-            if verbose == True:
-                print('[V] Reloading service: ' + service)
+        run_command('systemctl {} {}'.format(action, service), systemctl_verbose)
+        if verbose:
+            print('[V] {} service: {}'.format(action.capitalize(), service))
 
 ##########################################################################################################################
 # Execute remote SSH command and sudo (requires paramiko module installed)
