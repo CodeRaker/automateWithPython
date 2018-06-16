@@ -60,15 +60,15 @@ def file_editor(mode, filepath, line_startswith, text_to_add, verbose):
         with open(filepath + '.new', 'w') as outfile:
             for line in infile:
                if line.rstrip().startswith(line_startswith):
-                    if mode = 'comment':
+                    if mode == 'comment':
                         outfile.write('#' + line + '\n')
-                    if mode = 'replace':
+                    if mode == 'replace':
                         outfile.write(text_to_add + '\n')
                     if verbose:
                         print('[V] Edited line: ' + line)
                else:
                    outfile.write(line + '\n')
-            if mode = 'comment':
+            if mode == 'comment':
                 outfile.write(text_to_add + "\n")
             if verbose:
                 print('[V] Appendended: ' + text_to_add)
