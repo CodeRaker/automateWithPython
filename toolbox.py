@@ -56,8 +56,8 @@ def check_ipv4_syntax(address):
 # Example: toolbox.file_editor('/etc/ntp.conf', 'pool ', 'pool myserver', False)
 ##########################################################################################################################
 def file_editor(filepath, line_startswith, text_to_append, verbose):
-    with open(path) as infile:
-        with open(path + '.new', 'w') as outfile:
+    with open(filepath) as infile:
+        with open(filepath + '.new', 'w') as outfile:
             for line in infile:
                if line.rstrip().startswith(line_startswith):
                     outfile.write('#' + line + '\n')
@@ -68,10 +68,10 @@ def file_editor(filepath, line_startswith, text_to_append, verbose):
             outfile.write(text_to_append + "\n")
             if verbose:
                 print('[V] Appendended: ' + text_to_append)
-            run_command('mv ' + path + ' ' + path + '.old', False)
-            run_command('mv ' + path + '.new ' + path, False)
+            run_command('mv ' + filepath + ' ' + filepath + '.old', False)
+            run_command('mv ' + filepath + '.new ' + filepath, False)
             if verbose:
-                print('[V] Backed up original config file to ' + path + '.old')
+                print('[V] Backed up original config file to ' + filepath + '.old')
 
 ##########################################################################################################################
 # Takes a list object and checks if apt package is installed and returns two list objects
