@@ -52,22 +52,26 @@ def check_ipv4_syntax(address):
     return True
 
 ##########################################################################################################################
-# Loops through given file and comments lines in and appends a provided string
+# Loops through given file and comments lines in and appends a provided string or replaces strings depending on mode
 # Example: toolbox.file_editor('/etc/ntp.conf', 'pool ', 'pool myserver', False)
 ##########################################################################################################################
-def file_editor(filepath, line_startswith, text_to_append, verbose):
+def file_editor(mode, filepath, line_startswith, text_to_add, verbose):
     with open(filepath) as infile:
         with open(filepath + '.new', 'w') as outfile:
             for line in infile:
                if line.rstrip().startswith(line_startswith):
-                    outfile.write('#' + line + '\n')
+                    if mode = 'comment':
+                        outfile.write('#' + line + '\n')
+                    if mode = 'replace':
+                        outfile.write(text_to_add + '\n')
                     if verbose:
-                        print('[V] Commenting in line: ' + line)
+                        print('[V] Edited line: ' + line)
                else:
                    outfile.write(line + '\n')
-            outfile.write(text_to_append + "\n")
+            if mode = 'comment':
+                outfile.write(text_to_add + "\n")
             if verbose:
-                print('[V] Appendended: ' + text_to_append)
+                print('[V] Appendended: ' + text_to_add)
             run_command('mv ' + filepath + ' ' + filepath + '.old', False)
             run_command('mv ' + filepath + '.new ' + filepath, False)
             if verbose:
