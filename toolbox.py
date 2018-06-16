@@ -5,10 +5,12 @@ import socket, subprocess
 ##########################################################################################################################
 # Optional modules from requirements.txt are ignored if non-existent
 ##########################################################################################################################
-try:
-    import paramiko
-except ImportError:
-    pass
+optional_modules = ['paramiko']
+for module in optional_modules:
+    try:
+        import paramiko
+    except ImportError:
+        pass
 
 ##########################################################################################################################
 # Command Executor
