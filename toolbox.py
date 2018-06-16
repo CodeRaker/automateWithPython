@@ -3,8 +3,10 @@
 import socket
 
 # Command Executor
-def run_command(command):
+def run_command(command, verbose):
     CMD = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    if verbose == True:
+        print(CMD.stdout.read())
     return CMD.stdout.read()
 
 # Port Check
@@ -34,17 +36,23 @@ def check_ipv4_syntax(address):
     return True
 
 # Loops through given file and comments lines in and appends a provided string
-def file_comment_and_append(filepath, line_startswith, text_to_append):
+def file_editor(filepath, line_startswith, text_to_append, verbose):
     with open(path) as infile:
         with open(path + '.new', 'w') as outfile:
             for line in infile:
                if line.rstrip().startswith(line_startswith):
-                   outfile.write('#' + line + '\n')
+                    outfile.write('#' + line + '\n')
+                    if verbose == True:
+                        print('[V] Commenting in line: ' + line)
                else:
                    outfile.write(line + '\n')
             outfile.write(text_to_append + "\n")
+                    if verbose == True:
+                        print('[V] Appendended: ' + text_to_append)
             run_command('mv ' + path + ' ' + path + '.old')
             run_command('mv ' + path + '.new ' + path)
+            if verbose == True:
+                print('[V] Backed up original config file to ' + path + '.old')
 
 # Takes a list object and checks if apt package is installed and returns two list objects with installed and not installed packages
 def apt_check_packages(packages, verbose):
@@ -53,17 +61,17 @@ def apt_check_packages(packages, verbose):
     for package in packages:
         if '[installed]' in run_command('apt list ' + package):
             if verbose == True:
-                print('[+] ' + package + ' is installed')
+                print('[V] ' + package + ' is installed')
             packages_installed.append(package)
         else:
             packages_not_installed.append(package)
             if verbose == True:
-                print('[-] ' + package + ' is not installed')
+                print('[V] ' + package + ' is not installed')
     return packages_installed, packages_not_installed
 
 # Takes a list object and installs apt packages one by one
 def apt_install_packages(packages, verbose):
     for package in packages:
         if verbose == True:
-            print('[+] Installing ' + package)
+            print('[V] Installing ' + package)
         run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package)
