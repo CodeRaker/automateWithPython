@@ -71,7 +71,8 @@ def apt_check_packages(packages, verbose):
 
 # Takes a list object and installs apt packages one by one
 def apt_install_packages(packages, verbose):
-    for package in packages:
+    packages_installed, packages_not_installed = apt_check_packages(packages, verbose)
+    for package in packages_not_installed:
         if verbose == True:
             print('[V] Installing ' + package)
         run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package)
