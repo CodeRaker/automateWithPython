@@ -46,14 +46,24 @@ def file_comment_and_append(filepath, line_startswith, text_to_append):
             run_command('mv ' + path + ' ' + path + '.old')
             run_command('mv ' + path + '.new ' + path)
 
-# Check if apt package is installed and returns list objects with installed and not installed packages
-def check_apt_packages_status(packages):
-    packages = packages.split(' ')
+# Takes a list object and checks if apt package is installed and returns two list objects with installed and not installed packages
+def apt_check_packages(packages, verbose):
     packages_installed = []
     packages_not_installed = []
     for package in packages:
         if '[installed]' in run_command('apt list ' + package):
+            if verbose == True:
+                print('[+] ' + package + ' is installed')
             packages_installed.append(package)
         else:
             packages_not_installed.append(package)
+            if verbose == True:
+                print('[-] ' + package + ' is not installed')
     return packages_installed, packages_not_installed
+
+# Takes a list object and installs apt packages one by one
+def apt_install_packages(packages, verbose):
+    for package in packages:
+        if verbose == True:
+            print('[+] Installing ' + package)
+        run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package)
