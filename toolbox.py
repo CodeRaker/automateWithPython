@@ -1,6 +1,6 @@
 """ The Toolbox module is written by Peter Hecht Glad and contains the following tools: """
 
-import socket, subprocess
+import socket, subprocess, paramiko
 
 ##########################################################################################################################
 # Command Executor
@@ -118,3 +118,25 @@ def service(services, action, verbose):
             run_command('systemctl reload ' + service, systemctl_verbose)
             if verbose == True:
                 print('[V] Reloading service: ' + service)
+
+##########################################################################################################################
+# Execute remote SSH command and sudo
+# Example: run_ssh_command('10.10.10.1', 22, 'username', 'password', 'systemctl start apache2', True)
+##########################################################################################################################
+def run_ssh_command(server, port, user, password, command, verbose):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(server, port, user, password)
+    transport = ssh.get_transport()
+    session = transport.open_session()
+    session.set_combine_stderr(True)
+    session.get_pty()
+    session.exec_command("sudo -k " + command)
+    stdin = session.makefile('wb', -1)
+    stdout = session.makefile('rb', -1)
+    stdin.write(password +'\n')
+    stdin.flush()
+    if verbose == True:
+        print('Host: ' + server)
+        for line in stdout.read().splitlines():
+            print(line)
