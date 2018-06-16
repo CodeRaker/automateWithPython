@@ -61,15 +61,15 @@ def file_editor(filepath, line_startswith, text_to_append, verbose):
             for line in infile:
                if line.rstrip().startswith(line_startswith):
                     outfile.write('#' + line + '\n')
-                    if verbose == True:
+                    if verbose:
                         print('[V] Commenting in line: ' + line)
                else:
                    outfile.write(line + '\n')
             outfile.write(text_to_append + "\n")
             if verbose:
                 print('[V] Appendended: ' + text_to_append)
-            run_command('mv ' + path + ' ' + path + '.old')
-            run_command('mv ' + path + '.new ' + path)
+            run_command('mv ' + path + ' ' + path + '.old', False)
+            run_command('mv ' + path + '.new ' + path, False)
             if verbose:
                 print('[V] Backed up original config file to ' + path + '.old')
 
@@ -81,7 +81,7 @@ def apt_check_packages(packages, verbose):
     packages_installed = []
     packages_not_installed = []
     for package in packages:
-        if '[installed]' in run_command('apt list ' + package):
+        if '[installed]' in run_command('apt list ' + package, False):
             if verbose:
                 print('[V] ' + package + ' is installed')
             packages_installed.append(package)
@@ -100,16 +100,15 @@ def apt_install_packages(packages, verbose):
     for package in packages_not_installed:
         if verbose:
             print('[V] Installing ' + package)
-        run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package)
+        run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package, False)
 
 ##########################################################################################################################
 # Takes a list object and runs the provided action against systemctl
 # Example: list = ['apache2', 'networking']; toolbox.service(list, 'restart', False)
 ##########################################################################################################################
 def service(services, action, verbose):
-    systemctl_verbose = False
     for service in services:
-        run_command('systemctl {} {}'.format(action, service), systemctl_verbose)
+        run_command('systemctl {} {}'.format(action, service), False)
         if verbose:
             print('[V] {} service: {}'.format(action.capitalize(), service))
 
