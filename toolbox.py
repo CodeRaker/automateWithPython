@@ -76,3 +76,23 @@ def apt_install_packages(packages, verbose):
         if verbose == True:
             print('[V] Installing ' + package)
         run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package)
+
+# Takes a list object and runs the provided action against systemctl
+def service(services, action, verbose):
+    for service in services:
+        if action == 'restart':
+            run_command('systemctl restart ' + service)
+            if verbose == True:
+                print('[V] Restarting service: ' + service)
+        if action == 'start':
+            run_command('systemctl start ' + service)
+            if verbose == True:
+                print('[V] Starting service: ' + service)
+        if action == 'stop':
+            run_command('systemctl stop ' + service)
+            if verbose == True:
+                print('[V] Stopping service: ' + service)
+        if action == 'reload':
+            run_command('systemctl reload ' + service)
+            if verbose == True:
+                print('[V] Reloading service: ' + service)
