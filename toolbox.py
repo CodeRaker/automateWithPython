@@ -56,32 +56,37 @@ def check_ipv4_syntax(address):
 # Example: toolbox.file_editor('comment', '/etc/ntp.conf', 'pool ', 'pool myserver', False)
 ##########################################################################################################################
 def file_editor(mode, filepath, line_startswith, text_to_add, verbose):
+    if verbose:
+        print('[+] Writing to file: ' + filepath + ', using writing mode: ' + mode)
     with open(filepath) as infile:
         with open(filepath + '.new', 'w') as outfile:
             for line in infile:
-               if line.rstrip().startswith(line_startswith):
+               if line.startswith(line_startswith):
+                    line = line.strip('\n')
                     if mode == 'comment':
                         outfile.write('#' + line + '\n')
                     if mode == 'replace':
                         outfile.write(text_to_add + '\n')
                     if verbose:
-                        print('[V] Edited line: ' + line)
+                        print('[+] Edited line: ' + line)
                else:
                    outfile.write(line + '\n')
             if mode == 'comment':
-                outfile.write(text_to_add + "\n")
-            if verbose:
-                print('[V] Appendended: ' + text_to_add)
+                outfile.write(text_to_add + '\n')
+                if verbose:
+                    print('[+] Appendended: ' + text_to_add)
             run_command('mv ' + filepath + ' ' + filepath + '.old', False)
             run_command('mv ' + filepath + '.new ' + filepath, False)
             if verbose:
-                print('[V] Backed up original config file to ' + filepath + '.old')
-                
+                print('[+] Backed up original config file to ' + filepath + '.old')
+
 ##########################################################################################################################
 # Writes a new file
 # Example: toolbox.file_writer('/etc/ntp.conf', 'text', False)
 ##########################################################################################################################
 def file_writer(filepath, text_to_add, verbose):
+    if verbose:
+        print('[+] Writing to file: ' + filepath)
     if os.path.exists(filepath):
         outfile_name = filepath + '.new'
     else:
@@ -93,8 +98,8 @@ def file_writer(filepath, text_to_add, verbose):
             run_command('mv ' + filepath + ' ' + filepath + '.old', False)
             run_command('mv ' + filepath + '.new ' + filepath, False)
             if verbose:
-                print('[V] Backed up original file to ' + filepath + '.old')
-            
+                print('[+] Backed up original file to ' + filepath + '.old')
+
 ##########################################################################################################################
 # Takes a list object and checks if apt package is installed and returns two list objects
 # Example: list = ['mlocate', 'telnet']; toolbox.apt_check_packages(list, True)
@@ -105,12 +110,12 @@ def apt_check_packages(packages, verbose):
     for package in packages:
         if '[installed]' in run_command('apt list ' + package, False):
             if verbose:
-                print('[V] ' + package + ' is installed')
+                print('[+] ' + package + ' is installed')
             packages_installed.append(package)
         else:
             packages_not_installed.append(package)
             if verbose:
-                print('[V] ' + package + ' is not installed')
+                print('[-] ' + package + ' is not installed')
     return packages_installed, packages_not_installed
 
 ##########################################################################################################################
@@ -121,7 +126,7 @@ def apt_install_packages(packages, verbose):
     packages_installed, packages_not_installed = apt_check_packages(packages, verbose)
     for package in packages_not_installed:
         if verbose:
-            print('[V] Installing ' + package)
+            print('[+] Installing ' + package)
         run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package, False)
 
 ##########################################################################################################################
@@ -132,7 +137,7 @@ def service(services, action, verbose):
     for service in services:
         run_command('systemctl {} {}'.format(action, service), False)
         if verbose:
-            print('[V] {} service: {}'.format(action.capitalize(), service))
+            print('[+] {} service: {}'.format(action.capitalize(), service))
 
 ##########################################################################################################################
 # Execute remote SSH command and sudo (requires paramiko module installed)
