@@ -19,6 +19,7 @@ for module in optional_modules:
 def run_command(command, verbose):
     CMD = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     if verbose:
+        print('[+] Showing result of command: ' + command)
         print(CMD.stdout.read())
     return CMD.stdout.read()
 
@@ -26,10 +27,15 @@ def run_command(command, verbose):
 # Port Check
 # Example: toolbox.check_tcp_port('10.10.10.1', 80)
 ##########################################################################################################################
-def check_tcp_port(ip, port):
+def check_tcp_port(ip, port, verbose):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         result = sock.connect_ex((ip,port))
+        if verbose:
+            if not result:
+                print('[+] TCP port: ' + str(port) + ' is open on ' + str(ip))
+            else:
+                print('[-] TCP port: ' + str(port) + ' is closed on ' + str(ip))
         return not result
     except Exception as e:
         return False
@@ -38,17 +44,23 @@ def check_tcp_port(ip, port):
 # IP Syntax Validator
 # Example: toolbox.check_ipv4_syntax('8.8.8.8')
 ##########################################################################################################################
-def check_ipv4_syntax(address):
+def check_ipv4_syntax(address, verbose):
     try:
         socket.inet_pton(socket.AF_INET, address)
     except AttributeError:
         try:
             socket.inet_aton(address)
         except socket.error:
+            if verbose:
+                print('[-] ' + address + ' is not a valid IPv4 address')
             return False
         return address.count('.') == 3
     except socket.error:
+        if verbose:
+            print('[-] ' + address + ' is not a valid IPv4 address')
         return False
+    if verbose:
+        print('[+] ' + address + ' is a valid IPv4 address')
     return True
 
 ##########################################################################################################################
@@ -56,8 +68,10 @@ def check_ipv4_syntax(address):
 # Example: toolbox.file_editor('comment', '/etc/ntp.conf', 'pool ', 'pool myserver', False)
 ##########################################################################################################################
 def file_editor(mode, filepath, line_startswith, text_to_add, verbose):
-    if verbose:
-        print('[+] Writing to file: ' + filepath + ', using writing mode: ' + mode)
+    if verbose and mode == 'replace':
+        print('[+] Writing to file: ' + filepath + ', looking to replace lines starting with: ' + line_startswith + ' with: ' + text_to_add)
+    elif verbose and mode == 'comment':
+        print('[+] Writing to file: ' + filepath + ', looking to comment in lines starting with: ' + line_startswith + ' and appending this: ' + text_to_add)
     with open(filepath) as infile:
         with open(filepath + '.new', 'w') as outfile:
             for line in infile:
@@ -65,16 +79,19 @@ def file_editor(mode, filepath, line_startswith, text_to_add, verbose):
                     line = line.strip('\n')
                     if mode == 'comment':
                         outfile.write('#' + line + '\n')
+                        if verbose:
+                            print('[#] Commented in this line: ' + line)
                     if mode == 'replace':
                         outfile.write(text_to_add + '\n')
-                    if verbose:
-                        print('[+] Edited line: ' + line)
+                        if verbose:
+                            print('[R] Replaced this line: ' + line)
                else:
                    outfile.write(line + '\n')
+            #Appending text to end of file if comment mode
             if mode == 'comment':
                 outfile.write(text_to_add + '\n')
                 if verbose:
-                    print('[+] Appendended: ' + text_to_add)
+                    print('[+] Appended this to file: ' + text_to_add)
             run_command('mv ' + filepath + ' ' + filepath + '.old', False)
             run_command('mv ' + filepath + '.new ' + filepath, False)
             if verbose:
