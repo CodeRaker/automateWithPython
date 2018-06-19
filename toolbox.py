@@ -127,12 +127,11 @@ def file_writer(filepath, text_to_add, verbose):
     except Exception as e:
         sys.stderr.write('[-] ' + e)
 
-
 ##########################################################################################################################
 # Reads contents of a file into object
 # Example: data = toolbox.file_reader('/etc/ntp.conf')
 ##########################################################################################################################
-def file_reader(filepath):
+def file_reader(filepath, verbose):
     try:
         with open(filepath) as file:
             data = file.read()
@@ -213,4 +212,4 @@ def run_ssh_command(server, port, user, password, command, verbose):
             for line in stdout.read().splitlines():
                 print(line)
     except Exception as e:
-        sys.stderr.write('[-] ' + e)  
+        sys.stderr.write('[-] ' + e)
