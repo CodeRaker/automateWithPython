@@ -1,6 +1,6 @@
 """ The Toolbox module is written by Peter Hecht Glad and contains the following tools: """
 
-import socket, subprocess, os, sys
+import socket, subprocess, os, sys, time
 
 ##########################################################################################################################
 # Optional modules from requirements.txt are ignored if non-existent
@@ -213,3 +213,18 @@ def run_ssh_command(server, port, user, password, command, verbose):
                 print(line)
     except Exception as e:
         sys.stderr.write('[-] ' + e)
+
+##########################################################################################################################
+# Decorator function to take and print run time
+# Example: @toolbox.stopwatch
+#          def helloworld():
+#             pass
+##########################################################################################################################
+def stopwatch(function):
+    def wrapper(*arg, **kw):
+        t1 = time.time()
+        result = function(*arg, **kw)
+        t2 = time.time()
+        print('[+] ' + function.__name__ + ' took ' + str(t2 - t1) + ' seconds')
+        return result
+    return wrapper
