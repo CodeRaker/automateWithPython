@@ -1,6 +1,6 @@
 """ The Toolbox module is written by Peter Hecht Glad and contains the following tools: """
 
-import socket, subprocess, os, sys, time
+import socket, subprocess, os, sys, time, getpass
 
 ##########################################################################################################################
 # Optional modules from requirements.txt are ignored if non-existent
@@ -36,6 +36,7 @@ class network(object):
     # Port Check
     # Example: toolbox.network.check_tcp_port('10.10.10.1', 80)
     ##########################################################################################################################
+    @staticmethod
     def check_tcp_port(ip, port, verbose):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -54,6 +55,7 @@ class network(object):
     # IP Syntax Validator
     # Example: toolbox.network.check_ipv4_syntax('8.8.8.8')
     ##########################################################################################################################
+    @staticmethod
     def check_ipv4_syntax(address, verbose):
         try:
             socket.inet_pton(socket.AF_INET, address)
@@ -75,8 +77,9 @@ class network(object):
 
     ##########################################################################################################################
     # Execute remote SSH command and sudo (requires paramiko module installed)
-    # Example: toolbox.remote.ssh_command('10.10.10.1', 22, 'username', 'password', 'systemctl start apache2', True)
+    # Example: toolbox.network.ssh_command('10.10.10.1', 22, 'username', 'password', 'systemctl start apache2', True)
     ##########################################################################################################################
+    @staticmethod
     def ssh_command(server, port, user, password, command, verbose):
         try:
             ssh = paramiko.SSHClient()
@@ -103,6 +106,7 @@ class file(object):
     # Loops through given file and comments lines in and appends a provided string or replaces strings depending on mode
     # Example: toolbox.file.editor('comment', '/etc/ntp.conf', 'pool ', 'pool myserver', False)
     ##########################################################################################################################
+    @staticmethod
     def editor(mode, filepath, line_startswith, text_to_add, verbose):
         if verbose and mode == 'replace':
             print('[+] Writing to file: ' + filepath + ', looking to replace lines starting with: ' + line_startswith + ' with: ' + text_to_add)
@@ -140,6 +144,7 @@ class file(object):
     # Writes a new file
     # Example: toolbox.file.writer('/etc/ntp.conf', 'text', False)
     ##########################################################################################################################
+    @staticmethod
     def writer(filepath, text_to_add, verbose):
         if verbose:
             print('[+] Writing to file: ' + filepath)
@@ -163,6 +168,7 @@ class file(object):
     # Reads contents of a file into object
     # Example: data = toolbox.file.reader('/etc/ntp.conf')
     ##########################################################################################################################
+    @staticmethod
     def reader(filepath, verbose):
         try:
             with open(filepath) as file:
@@ -178,6 +184,7 @@ class apt(object):
     # Takes a list object and checks if apt package is installed and returns two list objects
     # Example: list = ['mlocate', 'telnet']; toolbox.apt.check_packages(list, True)
     ##########################################################################################################################
+    @staticmethod
     def check_packages(packages, verbose):
         packages_installed = []
         packages_not_installed = []
@@ -199,6 +206,7 @@ class apt(object):
     # Takes a list object and installs apt packages one by one
     # Example: list = ['mlocate', 'telnet']; toolbox.apt.install_packages(list, True)
     ##########################################################################################################################
+    @staticmethod
     def install_packages(packages, verbose):
         packages_installed, packages_not_installed = apt_check_packages(packages, verbose)
         try:
@@ -214,12 +222,14 @@ class system(object):
     # Command Executor
     # Example: toolbox.system.command('ls /', True) """
     ##########################################################################################################################
+    @staticmethod
     def command(command, verbose):
         try:
             CMD = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             if verbose:
-                print('[+] Showing result of command: ' + command)
+                print('[+] Command output [BEGIN]\n' + command)
                 print(CMD.stdout.read())
+                print('[+] Command output [END]')
             return CMD.stdout.read()
         except Exception as e:
             sys.stderr.write('[-] ' + e)
@@ -228,6 +238,7 @@ class system(object):
     # Takes a list object and runs the provided action against systemctl
     # Example: list = ['apache2', 'networking']; toolbox.system.service(list, 'restart', False)
     ##########################################################################################################################
+    @staticmethod
     def service(services, action, verbose):
         try:
             for service in services:
@@ -236,3 +247,26 @@ class system(object):
                     print('[+] {} service: {}'.format(action.capitalize(), service))
         except Exception as e:
             sys.stderr.write('[-] ' + e)
+
+    ##########################################################################################################################
+    # Get user input
+    # Example: toolbox.system.input('[Enter password here]', hide=True, require=True)
+    ##########################################################################################################################
+    @staticmethod
+    def input(prompt, hide, require):
+        if hide:
+            if require:
+                user_input = ''
+                while user_input == '':
+                    user_input = getpass.getpass(prompt)
+            else:
+                user_input = getpass.getpass(prompt)
+            return user_input
+        else:
+            if require:
+                user_input = ''
+                while user_input == '':
+                    user_input = raw_input(prompt)
+            else:
+                user_input = raw_input(prompt)
+            return user_input
