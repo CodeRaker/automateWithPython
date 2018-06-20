@@ -48,7 +48,7 @@ class network(object):
                     print('[-] TCP port: ' + str(port) + ' is closed on ' + str(ip))
             return not result
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
             return False
 
     ##########################################################################################################################
@@ -99,7 +99,7 @@ class network(object):
                 for line in stdout.read().splitlines():
                     print(line)
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
 
 class file(object):
     ##########################################################################################################################
@@ -138,7 +138,7 @@ class file(object):
                     if verbose:
                         print('[+] Backed up original config file to ' + filepath + '.old')
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
 
     ##########################################################################################################################
     # Writes a new file
@@ -162,7 +162,7 @@ class file(object):
                     run_command('mv ' + filepath + ' ' + filepath + '.old', False)
                     run_command('mv ' + filepath + '.new ' + filepath, False)
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
 
     ##########################################################################################################################
     # Reads contents of a file into object
@@ -177,7 +177,7 @@ class file(object):
                     print('[+] Read file: ' + filepath)
                 return data
         except Exception as e:
-             sys.stderr.write('[-] ' + e)
+             sys.stderr.write('[-] ' + str(e))
 
 class apt(object):
     ##########################################################################################################################
@@ -200,7 +200,7 @@ class apt(object):
                         print('[-] ' + package + ' is not installed')
             return packages_installed, packages_not_installed
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
 
     ##########################################################################################################################
     # Takes a list object and installs apt packages one by one
@@ -215,7 +215,7 @@ class apt(object):
                     print('[+] Installing ' + package)
                 run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package, False)
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
 
 class system(object):
     ##########################################################################################################################
@@ -227,12 +227,18 @@ class system(object):
         try:
             CMD = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             if verbose:
-                print('[+] Command output [BEGIN]\n' + command)
-                print(CMD.stdout.read())
-                print('[+] Command output [END]')
+                print('[+] Command executed: ' + command)
+                if CMD.stdout.readline():
+                    print('[+] Showing output:\n')
+                    print('[OUTPUT-BEGIN]')
+                    for line in CMD.stdout:
+                        print(line.strip('\n'))
+                    print('[OUTPUT-END]\n')
+                else:
+                    print('[!] Command did not produce an output')
             return CMD.stdout.read()
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
 
     ##########################################################################################################################
     # Takes a list object and runs the provided action against systemctl
@@ -246,7 +252,7 @@ class system(object):
                 if verbose:
                     print('[+] {} service: {}'.format(action.capitalize(), service))
         except Exception as e:
-            sys.stderr.write('[-] ' + e)
+            sys.stderr.write('[-] ' + str(e))
 
     ##########################################################################################################################
     # Get user input
@@ -254,19 +260,22 @@ class system(object):
     ##########################################################################################################################
     @staticmethod
     def input(prompt, hide, require):
-        if hide:
-            if require:
-                user_input = ''
-                while user_input == '':
+        try:
+            if hide:
+                if require:
+                    user_input = ''
+                    while user_input == '':
+                        user_input = getpass.getpass(prompt)
+                else:
                     user_input = getpass.getpass(prompt)
+                return user_input
             else:
-                user_input = getpass.getpass(prompt)
-            return user_input
-        else:
-            if require:
-                user_input = ''
-                while user_input == '':
+                if require:
+                    user_input = ''
+                    while user_input == '':
+                        user_input = raw_input(prompt)
+                else:
                     user_input = raw_input(prompt)
-            else:
-                user_input = raw_input(prompt)
-            return user_input
+                return user_input
+        except Exception as e:
+            sys.stderr.write('[-] ' + str(e))
