@@ -210,30 +210,34 @@ class apt(object):
     def install_packages(packages, verbose):
         packages_installed, packages_not_installed = apt_check_packages(packages, verbose)
         try:
-            for package in packages_not_installed:
+            if packages_not_installed:
+                for package in packages_not_installed:
+                    if verbose:
+                        print('[+] Installing ' + package)
+                    run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package, False)
+            else:
                 if verbose:
-                    print('[+] Installing ' + package)
-                run_command('apt install -y -qq -o=Dpkg::Use-Pty=0 ' + package, False)
+                    print('[+] Nothing to install')
         except Exception as e:
             sys.stderr.write('[-] ' + str(e))
 
 class system(object):
     ##########################################################################################################################
     # Command Executor
-    # Example: toolbox.system.command('ls /', True) """
+    # Example: toolbox.system.command(command='ls /', show_output=False, verbose=True) """
     ##########################################################################################################################
     @staticmethod
-    def command(command, verbose):
+    def command(command, show_output, verbose):
         try:
             CMD = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             if verbose:
                 print('[+] Command executed: ' + command)
+            if show_output:
                 if CMD.stdout.readline():
                     print('[+] Showing output:\n')
-                    print('[OUTPUT-BEGIN]')
                     for line in CMD.stdout:
                         print(line.strip('\n'))
-                    print('[OUTPUT-END]\n')
+                    print('\n')
                 else:
                     print('[!] Command did not produce an output')
             return CMD.stdout.read()
