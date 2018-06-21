@@ -101,6 +101,19 @@ class network(object):
         except Exception as e:
             sys.stderr.write('[-] ' + str(e))
 
+    ##########################################################################################################################
+    # Get data from webpage (requires requests module installed)
+    # Example: toolbox.network.get_url('http://icanhazip.com', verbose=False)
+    ##########################################################################################################################
+    @staticmethod
+    def get_url(url, verbose):
+        r = requests.get(url)
+        if verbose:
+            print('[+] Showing result for: ' + url)
+            for line in r:
+                print(line)
+        return r
+
 class file(object):
     ##########################################################################################################################
     # Loops through given file and comments lines in and appends a provided string or replaces strings depending on mode
