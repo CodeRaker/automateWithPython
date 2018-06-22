@@ -5,10 +5,10 @@ import socket, subprocess, os, sys, time, getpass
 ##########################################################################################################################
 # Optional modules from requirements.txt are ignored if non-existent
 ##########################################################################################################################
-optional_modules = ['paramiko','requests']
+optional_modules = ['paramiko','requests', 'json']
 for module in optional_modules:
     try:
-        import paramiko
+        import module
     except ImportError:
         pass
 
@@ -113,6 +113,32 @@ class network(object):
             for line in r:
                 print(line)
         return r
+
+    ##########################################################################################################################
+    # Get jsondata from webpage (requires json module installed)
+    # Example: toolbox.network.get_json(baseurl=api.steam.com, uri='/apicall.php?token=341243', port=80, verbose=False
+    ##########################################################################################################################
+    def get_json(baseurl, uri, port, verbose):
+    try:
+        httpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        httpsock.connect((baseurl, port))
+        httpsock.sendall(('GET ' + uri + ' HTTP/1.1\r\nHost: ' + baseurl + '\r\n\r\n').encode())
+        time.sleep(1)
+        data = httpsock.recv(20000).decode('UTF-8')
+        httpsock.close()
+
+        if verbose:
+            print('[+] Fetching data from: ' + baseurl + uri + ' via port: ' + str(port))
+            if '500 Internal Server Error' in data:
+                print('[-] 500 Internal Server Error')
+
+        #Builds data structure and returns to requesting code
+        else:
+            data = json.loads(data)
+            return data
+
+    except Exception as e:
+        sys.stderr.write('[-] ' + str(e))
 
 class file(object):
     ##########################################################################################################################
