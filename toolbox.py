@@ -5,7 +5,7 @@ import socket, subprocess, os, sys, time, getpass
 ##########################################################################################################################
 # Optional modules from requirements.txt are ignored if non-existent
 ##########################################################################################################################
-optional_modules = ['paramiko']
+optional_modules = ['paramiko','requests']
 for module in optional_modules:
     try:
         import paramiko
