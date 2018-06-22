@@ -118,6 +118,7 @@ class network(object):
     # Get jsondata from webpage (requires json module installed)
     # Example: toolbox.network.get_json(baseurl=api.steam.com, uri='/apicall.php?token=341243', port=80, verbose=False
     ##########################################################################################################################
+    @staticmethod
     def get_json(baseurl, uri, port, verbose):
     try:
         httpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -263,7 +264,7 @@ class apt(object):
 class system(object):
     ##########################################################################################################################
     # Command Executor
-    # Example: toolbox.system.command(command='ls /', show_output=False, verbose=True) """
+    # Example: toolbox.system.command(command='ls /', show_output=False, verbose=True)
     ##########################################################################################################################
     @staticmethod
     def command(command, show_output, verbose):
