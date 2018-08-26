@@ -171,18 +171,18 @@ class file(object):
                             if mode == 'comment':
                                 outfile.write('#' + line + '\n')
                                 if verbose:
-                                    print('[#] Commented in the line: ' + line)
+                                    print('[+] Commented in the line: ' + line)
 
                             #Replace line that matches identifier
                             elif mode == 'replace':
                                 outfile.write(text_to_add + '\n')
                                 if verbose:
-                                    print('[R] Replaced the line: ' + line + ' .. with .. ' + text_to_add)
+                                    print('[+] Replaced the line: ' + line + ' .. with .. ' + text_to_add)
 
                             #Remove line that matches identifier
                             elif mode == 'remove':
                                 if verbose:
-                                    print('[R] Removed the line: ' + line)
+                                    print('[+] Removed the line: ' + line)
 
                        #Nothing matched continue
                        else:
@@ -192,13 +192,13 @@ class file(object):
                     if mode in ['comment', 'append'] and text_to_add != '':
                         outfile.write(text_to_add + '\n')
                         if verbose:
-                            print('[+] Appended this to file: ' + text_to_add)
+                            print('[+] Appended the following: ' + text_to_add)
 
                     #Rename .new file to real filename and original file to .old for backup
                     run_command('mv ' + filepath + ' ' + filepath + '.old', False)
                     run_command('mv ' + filepath + '.new ' + filepath, False)
                     if verbose:
-                        print('[+] Backed up original config file to ' + filepath + '.old')
+                        print('[+] Backed up original file to ' + filepath + '.old')
 
         except Exception as e:
             sys.stderr.write('[-] ' + str(e))
