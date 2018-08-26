@@ -147,36 +147,59 @@ class file(object):
     # Example: toolbox.file.editor('comment', '/etc/ntp.conf', 'pool ', 'pool myserver', False)
     ##########################################################################################################################
     @staticmethod
-    def editor(mode, filepath, line_startswith, text_to_add, verbose):
+    def editor(mode, filepath, line_startswith='', text_to_add='', verbose=False):
+
         if verbose and mode == 'replace':
-            print('[+] Writing to file: ' + filepath + ', looking to replace lines starting with: ' + line_startswith + ' with: ' + text_to_add)
+            print('[+] Editing file: ' + filepath + ', looking to replace lines starting with: ' + line_startswith + ' with: ' + text_to_add)
         elif verbose and mode == 'comment':
-            print('[+] Writing to file: ' + filepath + ', looking to comment in lines starting with: ' + line_startswith + ' and appending this: ' + text_to_add)
+            print('[+] Editing file: ' + filepath + ', looking to comment in lines starting with: ' + line_startswith + ' and appending this: ' + text_to_add)
+        elif verbose and mode == 'remove':
+            print('[+] Editing file: ' + filepath + ', looking to remove lines starting with: ' + line_startswith)
+
         try:
             with open(filepath) as infile:
                 with open(filepath + '.new', 'w') as outfile:
+
+                    #This part does inline editing, either by replacing, removing or commenting in a line that matches the identifier (line_startswith)
                     for line in infile:
-                       if line.startswith(line_startswith):
+
+                       #Identifier has found a match
+                       if line_startswith != '' and line.startswith(line_startswith):
                             line = line.strip('\n')
+
+                            #Comment in line that matches identifier
                             if mode == 'comment':
                                 outfile.write('#' + line + '\n')
                                 if verbose:
-                                    print('[#] Commented in this line: ' + line)
-                            if mode == 'replace':
+                                    print('[#] Commented in the line: ' + line)
+
+                            #Replace line that matches identifier
+                            elif mode == 'replace':
                                 outfile.write(text_to_add + '\n')
                                 if verbose:
-                                    print('[R] Replaced this line: ' + line)
+                                    print('[R] Replaced the line: ' + line + ' .. with .. ' + text_to_add)
+
+                            #Remove line that matches identifier
+                            elif mode == 'remove':
+                                if verbose:
+                                    print('[R] Removed the line: ' + line)
+
+                       #Nothing matched continue
                        else:
                            outfile.write(line + '\n')
+
                     #Appending text to end of file if comment mode
-                    if mode == 'comment':
+                    if mode in ['comment', 'append'] and text_to_add != '':
                         outfile.write(text_to_add + '\n')
                         if verbose:
                             print('[+] Appended this to file: ' + text_to_add)
+
+                    #Rename .new file to real filename and original file to .old for backup
                     run_command('mv ' + filepath + ' ' + filepath + '.old', False)
                     run_command('mv ' + filepath + '.new ' + filepath, False)
                     if verbose:
                         print('[+] Backed up original config file to ' + filepath + '.old')
+
         except Exception as e:
             sys.stderr.write('[-] ' + str(e))
 
@@ -185,7 +208,7 @@ class file(object):
     # Example: toolbox.file.writer('/etc/ntp.conf', 'text', False)
     ##########################################################################################################################
     @staticmethod
-    def writer(filepath, text_to_add, verbose):
+    def writer(filepath, text_to_add, verbose=False):
         if verbose:
             print('[+] Writing to file: ' + filepath)
         if os.path.exists(filepath):
@@ -209,7 +232,7 @@ class file(object):
     # Example: data = toolbox.file.reader('/etc/ntp.conf')
     ##########################################################################################################################
     @staticmethod
-    def reader(filepath, verbose):
+    def reader(filepath, verbose=False):
         try:
             with open(filepath) as file:
                 data = file.read()
@@ -289,7 +312,7 @@ class system(object):
     # Example: list = ['apache2', 'networking']; toolbox.system.service(list, 'restart', False)
     ##########################################################################################################################
     @staticmethod
-    def service(services, action, verbose):
+    def service(services, action, verbose=False):
         try:
             for service in services:
                 run_command('systemctl {} {}'.format(action, service), False)
