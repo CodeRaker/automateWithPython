@@ -24,7 +24,7 @@ while itemCounter != itemCount:
 
     # Print URL
     try:
-        print("Raw URL: " + apiRequest["request"]["url"]["raw"])
+        print("Raw URL: `" + apiRequest["request"]["url"]["raw"] + "`")
     except:
         pass
     print("")
@@ -108,3 +108,5 @@ while itemCounter != itemCount:
         pass
 
     itemCounter += 1
+
+    print("")
