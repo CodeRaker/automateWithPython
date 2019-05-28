@@ -1,6 +1,6 @@
 import json
 
-filePath = "/Users/ghost/Desktop/mcafeeepo.json"
+filePath = ""
 jsonDict = {}
 
 # Get RAW lines from json file
